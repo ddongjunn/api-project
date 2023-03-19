@@ -1,4 +1,4 @@
-package com.jobis.exception.advicd;
+package com.jobis.exception.advice;
 
 import com.jobis.exception.ErrorResult;
 import com.jobis.exception.RegistrationNotAllowedException;
