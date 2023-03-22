@@ -19,7 +19,7 @@ import java.time.Instant;
 public class TokenProvider {
     private final Algorithm hmac512;
     private final JWTVerifier verifier;
-    private static final Duration JWT_TOKEN_VALIDITY = Duration.ofMinutes(2);
+    private static final Duration JWT_TOKEN_VALIDITY = Duration.ofMinutes(20);
 
     public TokenProvider(@Value("${jwt.secret}") String secret) {
         this.hmac512 = Algorithm.HMAC512(secret);

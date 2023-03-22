@@ -1,5 +1,6 @@
 package com.jobis.service;
 
+import com.jobis.common.utils.AES256;
 import com.jobis.common.utils.TokenProvider;
 import com.jobis.config.security.CustomUserDetailsService;
 import com.jobis.domain.dto.LoginResponseDto;
@@ -47,7 +48,7 @@ public class MemberService {
     /**
      * 회원가입
      */
-    public String join(MemberRegistrationDto memberRegistrationDTO) {
+    public String join(MemberRegistrationDto memberRegistrationDTO) throws Exception {
         checkDuplicateUserId(memberRegistrationDTO.getUserId());
         isAvailableUser(memberRegistrationDTO);
 
@@ -55,7 +56,7 @@ public class MemberService {
                 memberRegistrationDTO.getUserId(),
                 passwordEncoder.encode(memberRegistrationDTO.getPassword()),
                 memberRegistrationDTO.getName(),
-                passwordEncoder.encode(memberRegistrationDTO.getRegNo())
+                encryptAES256String(memberRegistrationDTO.getRegNo())
         );
         memberRepository.save(member);
         return member.getUserId();
@@ -76,12 +77,11 @@ public class MemberService {
         return new LoginResponseDto(tokenProvider.generateToken(userDetails));
     }
 
-    public MemberInfoResponseDto getMemberInfo(){
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = (User) principal;
-
-        log.info("id{} password{}", user.getUsername(), user.getPassword());
-        return new MemberInfoResponseDto();
+    public MemberInfoResponseDto getMemberInfo() throws Exception {
+        User user = getCurrentUser();
+        String birthdate = getDecryptedRegNo(user);
+        Optional<Member> member = memberRepository.findByUserId(user.getUsername());
+        return new MemberInfoResponseDto(member.get().getUserId(), member.get().getName(), birthdate);
     }
 
     /**
@@ -100,6 +100,22 @@ public class MemberService {
     private void isAvailableUser(MemberRegistrationDto memberRegistrationDTO) {
         Optional<Whitelist> joinMember = whitelistRepository.findByUserIdAndRegNo(memberRegistrationDTO.getName(), memberRegistrationDTO.getRegNo());
         joinMember.orElseThrow(() -> new RegistrationNotAllowedException("등록된 사용자가 아닙니다."));
+    }
+
+    private User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return (User) principal;
+    }
+
+    private String getDecryptedRegNo(User user) throws Exception {
+        AES256 aes256 = new AES256();
+        Optional<Member> member = memberRepository.findByUserId(user.getUsername());
+        return aes256.decryptAES256RegNo(member.get().getRegNo());
+    }
+
+    private String encryptAES256String(String text) throws Exception {
+        AES256 aes256 = new AES256();
+        return aes256.encryptAES256(text);
     }
 
 

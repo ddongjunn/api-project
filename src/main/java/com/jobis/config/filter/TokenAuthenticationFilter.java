@@ -35,14 +35,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("TokenAuthenticationFilter");
+        log.info("TokenAuthenticationFilter 1");
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header == null || !header.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        log.info("TokenAuthenticationFilter2");
+        log.info("TokenAuthenticationFilter 2");
         String token = header.substring(7);
         String username = tokenProvider.validateTokenAndGetUsername(token);
         if (username == null) {
@@ -51,9 +51,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        log.info("TokenAuthenticationFilter3");
+        log.info("TokenAuthenticationFilter 3");
         CustomUserDetails userDetails = (CustomUserDetails) customUserDetailService.loadUserByUsername(username);
-        log.info("userId {}",userDetails.getUsername());
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, null);
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);

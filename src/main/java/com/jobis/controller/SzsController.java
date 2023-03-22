@@ -30,18 +30,18 @@ public class SzsController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody @Valid MemberRegistrationDto memberRegistrationDTO){
-        return ResponseEntity.ok(memberService.join(memberRegistrationDTO));
+    public ResponseEntity<?> signup(@RequestBody @Valid MemberRegistrationDto memberRegistrationDTO) throws Exception {
+        return ResponseEntity.ok().body(memberService.join(memberRegistrationDTO));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody MemberLoginDto memberLoginDto){
-        return ResponseEntity.ok(memberService.login(memberLoginDto));
+        return ResponseEntity.ok().body(memberService.login(memberLoginDto));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> myInfo(){
-        return ResponseEntity.ok(memberService.getMemberInfo());
+    public ResponseEntity<?> myInfo() throws Exception {
+        return ResponseEntity.ok().body(memberService.getMemberInfo());
     }
 
 }

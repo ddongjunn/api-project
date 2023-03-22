@@ -30,5 +30,10 @@ spring:
 
 jwt:
   secret: example_api_jwt_secret
-  exp_time: 60
+
+aes256:
+  alg: AES/CBC/PKCS5Padding
+  key: abcdefghabcdefghabcdefghabcdefgh
+  iv: 0123456789abcdef
+
 
