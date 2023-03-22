@@ -3,10 +3,7 @@ package com.jobis.service;
 import com.jobis.common.utils.AES256;
 import com.jobis.common.utils.TokenProvider;
 import com.jobis.config.security.CustomUserDetailsService;
-import com.jobis.domain.dto.LoginResponseDto;
-import com.jobis.domain.dto.MemberInfoResponseDto;
-import com.jobis.domain.dto.MemberLoginDto;
-import com.jobis.domain.dto.MemberRegistrationDto;
+import com.jobis.domain.dto.*;
 import com.jobis.domain.entity.Member;
 import com.jobis.domain.entity.Whitelist;
 import com.jobis.config.exception.RegistrationNotAllowedException;
@@ -19,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -27,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -48,7 +45,7 @@ public class MemberService {
     /**
      * 회원가입
      */
-    public String join(MemberRegistrationDto memberRegistrationDTO) throws Exception {
+    public SignUpResponseDto join(SignUpRequestDto memberRegistrationDTO) throws Exception {
         checkDuplicateUserId(memberRegistrationDTO.getUserId());
         isAvailableUser(memberRegistrationDTO);
 
@@ -59,13 +56,13 @@ public class MemberService {
                 encryptAES256String(memberRegistrationDTO.getRegNo())
         );
         memberRepository.save(member);
-        return member.getUserId();
+        return new SignUpResponseDto(member.getUserId(), LocalDateTime.now());
     }
 
     /**
      * 로그인
      */
-    public LoginResponseDto login(MemberLoginDto memberLoginDto) {
+    public LoginResponseDto login(LoginRequestDto memberLoginDto) {
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(memberLoginDto.getUserId(), memberLoginDto.getPassword()));
@@ -97,7 +94,7 @@ public class MemberService {
     /**
      * 회원 가입 가능 유저 확인
      */
-    private void isAvailableUser(MemberRegistrationDto memberRegistrationDTO) {
+    private void isAvailableUser(SignUpRequestDto memberRegistrationDTO) {
         Optional<Whitelist> joinMember = whitelistRepository.findByUserIdAndRegNo(memberRegistrationDTO.getName(), memberRegistrationDTO.getRegNo());
         joinMember.orElseThrow(() -> new RegistrationNotAllowedException("등록된 사용자가 아닙니다."));
     }
