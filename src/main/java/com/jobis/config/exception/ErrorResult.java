@@ -1,4 +1,4 @@
-package com.jobis.exception;
+package com.jobis.config.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

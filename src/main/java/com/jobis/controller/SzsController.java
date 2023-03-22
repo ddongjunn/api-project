@@ -1,6 +1,8 @@
 package com.jobis.controller;
 
-import com.jobis.domain.dto.MemberRegistrationDTO;
+import com.jobis.domain.dto.MemberInfoResponseDto;
+import com.jobis.domain.dto.MemberLoginDto;
+import com.jobis.domain.dto.MemberRegistrationDto;
 import com.jobis.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +24,24 @@ public class SzsController {
         return "hello";
     }
 
+    @GetMapping("/hello2")
+    public String hello2(){
+        return "hello";
+    }
+
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody @Valid MemberRegistrationDTO memberRegistrationDTO){
+    public ResponseEntity<?> signup(@RequestBody @Valid MemberRegistrationDto memberRegistrationDTO){
         return ResponseEntity.ok(memberService.join(memberRegistrationDTO));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody MemberLoginDto memberLoginDto){
+        return ResponseEntity.ok(memberService.login(memberLoginDto));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> myInfo(){
+        return ResponseEntity.ok(memberService.getMemberInfo());
+    }
+
 }

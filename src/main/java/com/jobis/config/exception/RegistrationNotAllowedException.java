@@ -1,6 +1,8 @@
-package com.jobis.exception;
+package com.jobis.config.exception;
 
-public class RegistrationNotAllowedException extends RuntimeException {
+import java.util.function.Supplier;
+
+public class RegistrationNotAllowedException extends RuntimeException{
 
     public RegistrationNotAllowedException(String message) {
         super(message);

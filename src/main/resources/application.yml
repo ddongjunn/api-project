@@ -29,5 +29,6 @@ spring:
       mode: always
 
 jwt:
-  secret: jwt_secret
+  secret: example_api_jwt_secret
+  exp_time: 60
 

@@ -1,8 +1,8 @@
-package com.jobis.exception.advice;
+package com.jobis.config.exception.advice;
 
-import com.jobis.exception.ErrorResult;
-import com.jobis.exception.RegistrationNotAllowedException;
-import com.jobis.exception.UserAlreadyExistsException;
+import com.jobis.config.exception.ErrorResult;
+import com.jobis.config.exception.RegistrationNotAllowedException;
+import com.jobis.config.exception.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

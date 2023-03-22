@@ -1,4 +1,4 @@
-package com.jobis.exception;
+package com.jobis.config.exception;
 
 public class UserAlreadyExistsException extends RuntimeException{
     public UserAlreadyExistsException(String message) {
