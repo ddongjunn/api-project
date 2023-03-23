@@ -12,7 +12,10 @@ import com.jobis.repository.MemberRepository;
 import com.jobis.repository.WhitelistRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,8 +25,12 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -74,11 +81,43 @@ public class MemberService {
         return new LoginResponseDto(tokenProvider.generateToken(userDetails));
     }
 
+    /**
+     * 회원정보 조회
+     */
     public MemberInfoResponseDto getMemberInfo() throws Exception {
         User user = getCurrentUser();
-        String birthdate = getDecryptedRegNo(user);
+        String birthdate = getDecryptedRegNoPrefix(user);
         Optional<Member> member = memberRepository.findByUserId(user.getUsername());
         return new MemberInfoResponseDto(member.get().getUserId(), member.get().getName(), birthdate);
+    }
+
+    public String scrap(HttpServletRequest request) throws Exception {
+        String responseData = callScrapApi();
+        JSONParser jsonParser = new JSONParser();
+        JSONObject result = (JSONObject) jsonParser.parse(responseData);
+
+        log.info("response = {}",result.get("data"));
+
+        return null;
+    }
+
+    public String callScrapApi() throws Exception {
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://codetest.3o3.co.kr/v2/scrap")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer JwtToken")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+
+        User user = getCurrentUser();
+        Optional<Member> member = memberRepository.findByUserId(user.getUsername());
+        ScrapRequestDto scrapRequestDto = new ScrapRequestDto(member.get().getName(), getDecryptedString(member.get().getRegNo()));
+
+        return  webClient
+                .post()
+                .bodyValue(scrapRequestDto)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
     }
 
     /**
@@ -104,10 +143,15 @@ public class MemberService {
         return (User) principal;
     }
 
-    private String getDecryptedRegNo(User user) throws Exception {
+    private String getDecryptedRegNoPrefix(User user) throws Exception {
         AES256 aes256 = new AES256();
         Optional<Member> member = memberRepository.findByUserId(user.getUsername());
         return aes256.decryptAES256RegNo(member.get().getRegNo());
+    }
+
+    private String getDecryptedString(String text) throws Exception {
+        AES256 aes256 = new AES256();
+        return aes256.decryptAES256(text);
     }
 
     private String encryptAES256String(String text) throws Exception {
