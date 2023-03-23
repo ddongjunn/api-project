@@ -1,6 +1,7 @@
 package com.jobis.common.utils;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 
 import java.util.Base64;
 import javax.crypto.Cipher;

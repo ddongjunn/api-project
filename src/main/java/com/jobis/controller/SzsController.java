@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -18,6 +17,7 @@ import javax.validation.Valid;
 public class SzsController {
 
     private final MemberService memberService;
+    private final ScrapService scrapService;
 
     @GetMapping("/hello")
     public String hello(){
@@ -45,8 +45,8 @@ public class SzsController {
     }
 
     @PostMapping("/scrap")
-    public ResponseEntity<?> scrap(HttpServletRequest request) throws Exception {
-        return ResponseEntity.ok().body(memberService.scrap(request));
+    public ResponseEntity<?> scrap() throws Exception {
+        return ResponseEntity.ok().body(scrapService.scrap());
     }
 
 }
