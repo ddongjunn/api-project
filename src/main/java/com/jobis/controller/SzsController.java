@@ -36,8 +36,13 @@ public class SzsController {
     }
 
     @PostMapping("/scrap")
-    public ResponseEntity<?> scrap() throws Exception {
+    public ResponseEntity<?> scrap()  {
         return ResponseEntity.ok().body(scrapService.scrap());
+    }
+
+    @GetMapping("/szs/refund")
+    public ResponseEntity<?> refund(){
+        return ResponseEntity.ok().body()
     }
 
 }

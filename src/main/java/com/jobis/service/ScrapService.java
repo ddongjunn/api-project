@@ -31,17 +31,13 @@ public class ScrapService {
     private final SalaryRepository salaryRepository;
     private final IncomeDeductionRepository incomeDeductionRepository;
 
-    public String scrap() throws Exception {
-        //TODO null 체크
+    public void scrap()  {
         ScrapResponseDto scrapResponseDto = callScrapApi();
         log.info("scrapResponseDto = {}",scrapResponseDto.toString());
 
-
         Member member = getMemberEntity();
         saveSalaryEntityFromScrapApi(scrapResponseDto, member);
-        saveIncomeDeductionRepository(scrapResponseDto, member);
-
-        return "ggg";
+        saveIncomeDeductionEntityFromScrapApi(scrapResponseDto, member);
     }
 
     public ScrapResponseDto callScrapApi() {
@@ -64,6 +60,42 @@ public class ScrapService {
                 .bodyToMono(ScrapResponseDto.class)
                 .doOnError(e -> log.error("call scrap api error = {}",e))
                 .block();
+    }
+
+    private void saveSalaryEntityFromScrapApi(ScrapResponseDto scrapResponseDto, Member member) {
+        ScrapResponseSalaryDto salaryDto = scrapResponseDto.getData().getJsonList().getSalary().get(0);
+        Salary salary = Salary.builder()
+                .member(member)
+                .incomeDetail(salaryDto.getIncomeDetail())
+                .totalPayment(commaSeparatedStringToLong(salaryDto.getTotalPayment()))
+                .workStartDate(convertToLocalDate(salaryDto.getWorkStartDate()))
+                .companyName(salaryDto.getCompanyName())
+                .employeeName(salaryDto.getEmployeeName())
+                .paymentDate(convertToLocalDate(salaryDto.getPaymentDate()))
+                .workEndDate(convertToLocalDate(salaryDto.getWorkEndDate()))
+                .regNo(encryptAES256String(salaryDto.getRegNo()))
+                .incomeType(salaryDto.getIncomeType())
+                .businessRegistrationNumber(salaryDto.getBusinessRegistrationNumber())
+                .calculatedTaxAmount(commaSeparatedStringToLong(scrapResponseDto.getData().getJsonList().getCalculatedTaxAmount()))
+                .build();
+        salaryRepository.save(salary);
+    }
+
+    private void saveIncomeDeductionEntityFromScrapApi(ScrapResponseDto scrapResponseDto, Member member){
+        List<ScrapResponseIncomeDeduction> incomeDeductionDto = scrapResponseDto.getData().getJsonList().getIncomeDeduction();
+        incomeDeductionDto.forEach(e -> {
+            IncomeDeduction incomeDeduction = IncomeDeduction.builder()
+                    .member(member)
+                    .incomeType(e.getIncomeType())
+                    .amount(commaSeparatedStringToLong(e.getAmount()))
+                    .build();
+            incomeDeductionRepository.save(incomeDeduction);
+        });
+    }
+
+    private Long commaSeparatedStringToLong(String str){
+        str = str.replaceAll(",","");
+        return Long.parseLong(str);
     }
 
     private String getDecryptedString(String text)  {
@@ -94,41 +126,5 @@ public class ScrapService {
         User user = (User) principal;
         return memberRepository.findByUserId(user.getUsername())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-    }
-
-    private void saveSalaryEntityFromScrapApi(ScrapResponseDto scrapResponseDto, Member member) {
-        ScrapResponseSalaryDto salaryDto = scrapResponseDto.getData().getJsonList().getSalary().get(0);
-        Salary salary = Salary.builder()
-                .member(member)
-                .incomeDetail(salaryDto.getIncomeDetail())
-                .totalPayment(commaSeparatedStringToLong(salaryDto.getTotalPayment()))
-                .workStartDate(convertToLocalDate(salaryDto.getWorkStartDate()))
-                .companyName(salaryDto.getCompanyName())
-                .employeeName(salaryDto.getEmployeeName())
-                .paymentDate(convertToLocalDate(salaryDto.getPaymentDate()))
-                .workEndDate(convertToLocalDate(salaryDto.getWorkEndDate()))
-                .regNo(encryptAES256String(salaryDto.getRegNo()))
-                .incomeType(salaryDto.getIncomeType())
-                .businessRegistrationNumber(salaryDto.getBusinessRegistrationNumber())
-                .calculatedTaxAmount(commaSeparatedStringToLong(scrapResponseDto.getData().getJsonList().getCalculatedTaxAmount()))
-                .build();
-        salaryRepository.save(salary);
-    }
-
-    private void saveIncomeDeductionRepository(ScrapResponseDto scrapResponseDto, Member member){
-        List<ScrapResponseIncomeDeduction> incomeDeductionDto = scrapResponseDto.getData().getJsonList().getIncomeDeduction();
-        incomeDeductionDto.forEach(e -> {
-            IncomeDeduction incomeDeduction = IncomeDeduction.builder()
-                    .member(member)
-                    .incomeType(e.getIncomeType())
-                    .amount(commaSeparatedStringToLong(e.getAmount()))
-                    .build();
-            incomeDeductionRepository.save(incomeDeduction);
-        });
-    }
-
-    private Long commaSeparatedStringToLong(String str){
-        str = str.replaceAll(",","");
-        return Long.parseLong(str);
     }
 }
