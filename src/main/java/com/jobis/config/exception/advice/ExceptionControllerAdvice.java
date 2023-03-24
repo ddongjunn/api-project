@@ -3,6 +3,7 @@ package com.jobis.config.exception.advice;
 import com.jobis.config.exception.ErrorResult;
 import com.jobis.config.exception.RegistrationNotAllowedException;
 import com.jobis.config.exception.UserAlreadyExistsException;
+import com.jobis.config.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,13 @@ public class ExceptionControllerAdvice {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ErrorResult> UsernameNotFoundExHandler(UsernameNotFoundException e){
+        log.error("ExceptionController: "+e.getMessage());
+        ErrorResult errorResult = new ErrorResult("UsernameNotFoundException", e.getMessage());
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResult> UserNotFoundExHandler(UserNotFoundException e){
         log.error("ExceptionController: "+e.getMessage());
         ErrorResult errorResult = new ErrorResult("UsernameNotFoundException", e.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);

@@ -1,6 +1,5 @@
 package com.jobis.repository;
 
-import com.jobis.domain.entity.Member;
 import com.jobis.domain.entity.Whitelist;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

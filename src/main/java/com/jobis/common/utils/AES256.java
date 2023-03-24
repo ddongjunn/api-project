@@ -20,6 +20,7 @@ public class AES256 {
 
     // 암호화
     public String encryptAES256(String text) throws Exception {
+
         Cipher cipher = Cipher.getInstance(ALG);
         SecretKeySpec keySpec = new SecretKeySpec(KEY.getBytes(), "AES");
         IvParameterSpec ivParamSpec = new IvParameterSpec(IV.getBytes());

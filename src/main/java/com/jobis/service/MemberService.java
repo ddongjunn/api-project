@@ -44,7 +44,7 @@ public class MemberService {
     /**
      * 회원가입
      */
-    public SignUpResponseDto join(SignUpRequestDto memberRegistrationDTO) throws Exception {
+    public SignUpResponseDto join(SignUpRequestDto memberRegistrationDTO){
         checkDuplicateUserId(memberRegistrationDTO.getUserId());
         isAvailableUser(memberRegistrationDTO);
 
@@ -76,7 +76,7 @@ public class MemberService {
     /**
      * 회원정보 조회
      */
-    public MemberInfoResponseDto getMemberInfo() throws Exception {
+    public MemberInfoResponseDto getMemberInfo()  {
         User user = getCurrentUser();
         String birthdate = getDecryptedRegNoPrefix(user);
         Optional<Member> member = memberRepository.findByUserId(user.getUsername());
@@ -107,15 +107,23 @@ public class MemberService {
         return (User) principal;
     }
 
-    private String getDecryptedRegNoPrefix(User user) throws Exception {
+    private String getDecryptedRegNoPrefix(User user) {
         AES256 aes256 = new AES256();
         Optional<Member> member = memberRepository.findByUserId(user.getUsername());
-        return aes256.decryptAES256RegNo(member.get().getRegNo());
+        try {
+            return aes256.decryptAES256RegNo(member.get().getRegNo());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private String encryptAES256String(String text) throws Exception {
+    private String encryptAES256String(String text) {
         AES256 aes256 = new AES256();
-        return aes256.encryptAES256(text);
+        try {
+            return aes256.encryptAES256(text);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

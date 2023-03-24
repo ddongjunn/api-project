@@ -6,7 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+
 
 @Entity
 @Builder
@@ -27,15 +28,15 @@ public class Salary {
 
     private Long totalPayment; //총지급액
 
-    private LocalDateTime workStartDate; //업무시작일
+    private LocalDate workStartDate; //업무시작일
 
     private String companyName; //기업명
 
     private String employeeName; //이름
 
-    private LocalDateTime paymentDate; //지급일
+    private LocalDate paymentDate; //지급일
 
-    private LocalDateTime workEndDate; //업무종료일
+    private LocalDate workEndDate; //업무종료일
 
     private String regNo; //주민등록번호
 
@@ -43,5 +44,6 @@ public class Salary {
 
     private String businessRegistrationNumber; //사업자등록번호
 
-    private String calculatedAmount; //산출새엑
+    private Long calculatedTaxAmount; //산출새엑
+
 }

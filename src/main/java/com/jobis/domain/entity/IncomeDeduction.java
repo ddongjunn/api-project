@@ -1,13 +1,11 @@
 package com.jobis.domain.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,8 +20,8 @@ public class IncomeDeduction {
     @JoinColumn(name = "user_id")
     private Member member;
 
-    private Long amount;
-
     private String incomeType;
+
+    private Long amount;
 
 }
