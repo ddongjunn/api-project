@@ -3,6 +3,7 @@ package com.jobis.controller;
 import com.jobis.domain.dto.LoginRequestDto;
 import com.jobis.domain.dto.SignUpRequestDto;
 import com.jobis.service.MemberService;
+import com.jobis.service.RefundService;
 import com.jobis.service.ScrapService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ public class SzsController {
 
     private final MemberService memberService;
     private final ScrapService scrapService;
+    private final RefundService refundService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid SignUpRequestDto memberRegistrationDTO) {
@@ -41,9 +43,9 @@ public class SzsController {
         return ResponseEntity.ok().body(scrapService.scrap(request));
     }
 
-//    @GetMapping("/szs/refund")
-//    public ResponseEntity<?> refund(){
-//        return ResponseEntity.ok().body();
-//    }
+    @GetMapping("/refund")
+    public ResponseEntity<?> refund(HttpServletRequest request){
+        return ResponseEntity.ok().body(refundService.refund(request));
+    }
 
 }

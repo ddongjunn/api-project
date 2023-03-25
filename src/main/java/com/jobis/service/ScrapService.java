@@ -39,7 +39,8 @@ public class ScrapService {
     public ReslutMessage scrap(HttpServletRequest request)  {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION).substring(7);
         String userId = tokenProvider.validateTokenAndGetUsername(token);
-
+        log.info("token {} ",token);
+        log.info("userId {} ",userId);
         Optional<Member> member = memberRepository.findByUserId(userId);
         Member loginMember = member.orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
 
@@ -68,7 +69,7 @@ public class ScrapService {
                 .block();
     }
 
-    private void saveSalaryEntityFromScrapApi(ScrapResponseDto scrapResponseDto, Member member) {
+    public void saveSalaryEntityFromScrapApi(ScrapResponseDto scrapResponseDto, Member member) {
         ScrapResponseSalaryDto salaryDto = scrapResponseDto.getData().getJsonList().getSalary().get(0);
         Salary salary = Salary.builder()
                 .member(member)
@@ -87,7 +88,7 @@ public class ScrapService {
         salaryRepository.save(salary);
     }
 
-    private void saveIncomeDeductionEntityFromScrapApi(ScrapResponseDto scrapResponseDto, Member member){
+    public void saveIncomeDeductionEntityFromScrapApi(ScrapResponseDto scrapResponseDto, Member member){
         List<ScrapResponseIncomeDeduction> incomeDeductionDto = scrapResponseDto.getData().getJsonList().getIncomeDeduction();
         incomeDeductionDto.forEach(e -> {
             IncomeDeduction incomeDeduction = IncomeDeduction.builder()
@@ -99,13 +100,13 @@ public class ScrapService {
         });
     }
 
-    private Long commaSeparatedStringToLong(String str){
+    public Long commaSeparatedStringToLong(String str){
         str = str.replaceAll(",","");
-        str = str.replaceAll("\\.","");
-        return Long.parseLong(str);
+        String[] parts = str.split("\\.");
+        return Long.parseLong(parts[0]);
     }
 
-    private String getDecryptedString(String text)  {
+    public String getDecryptedString(String text)  {
         AES256 aes256 = new AES256();
         try {
             return aes256.decryptAES256(text);
@@ -114,7 +115,7 @@ public class ScrapService {
         }
     }
 
-    private String encryptAES256String(String text) {
+    public String encryptAES256String(String text) {
         AES256 aes256 = new AES256();
         try {
             return aes256.encryptAES256(text);
@@ -123,8 +124,9 @@ public class ScrapService {
         }
     }
 
-    private LocalDate convertToLocalDate (String dateStr){
+    public LocalDate convertToLocalDate (String dateStr){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         return LocalDate.parse(dateStr, formatter);
     }
+
 }
