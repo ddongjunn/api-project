@@ -7,7 +7,6 @@ import com.jobis.repository.IncomeDeductionRepository;
 import com.jobis.repository.SalaryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.NumberFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -38,27 +37,16 @@ public class RefundService {
         } catch (IndexOutOfBoundsException e) {
             throw new NoSuchElementException("Salary data not found");
         }
-        log.info("산출세액 = {}",calculatedTaxAmount);
-        log.info("총지급액 = {}",totalPayment);
 
         Long employmentIncomeTaxAmount = calculateEmploymentIncomeTaxAmount(calculatedTaxAmount);
-        log.info("근로소득세액공제금액 = {}",employmentIncomeTaxAmount);
 
         List<Map<String, Object>> incomeDeductionData = incomeDeductionRepository.findByUserId(userId);
-
         Long retirementPensionTaxAmount = calculateRetirementPensionTaxAmount(incomeDeductionData);
-        log.info("퇴직연금세액공제금액 = {}",retirementPensionTaxAmount);
-
         Long specialDeductionTaxAmount = getSpecialDeductionTaxAmount(incomeDeductionData, totalPayment);
-        log.info("특별세액공제금액 = {}",specialDeductionTaxAmount);
-
         Long standardTaxAmount = calculateStandardTaxAmount(specialDeductionTaxAmount);
-        log.info("표준세액공제금액 = {}",standardTaxAmount);
 
         Long determinedTaxAmount = calculateDeterminedTaxAmount(calculatedTaxAmount, employmentIncomeTaxAmount, specialDeductionTaxAmount, standardTaxAmount, retirementPensionTaxAmount);
-        log.info("결정세액 = {}",determinedTaxAmount);
 
-//        return new RefundResponseDto(userId, determinedTaxAmount, retirementPensionTaxAmount);
         return new RefundResponseDto(userId, determinedTaxAmount, retirementPensionTaxAmount);
     }
 

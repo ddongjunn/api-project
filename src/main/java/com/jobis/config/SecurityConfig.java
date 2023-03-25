@@ -40,7 +40,7 @@ public class SecurityConfig {
         return (web) -> web.ignoring()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                 .antMatchers("/swagger-ui/**","/h2-console/**",
-                             "/szs/hello","/swagger-resources/**", "/v3/api-docs/");
+                             "/szs/hello","/swagger-resources/**", "/v3/api-docs");
     }
 
     @Bean

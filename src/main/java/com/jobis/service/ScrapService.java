@@ -15,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -54,7 +52,6 @@ public class ScrapService {
     public ScrapResponseDto callScrapApi(Member loginMember) {
         WebClient webClient = WebClient.builder()
                 .baseUrl("https://codetest.3o3.co.kr/v2/scrap")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer JwtToken")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
