@@ -1,6 +1,8 @@
 package com.jobis.service;
 
+import com.jobis.common.ReslutMessage;
 import com.jobis.common.utils.AES256;
+import com.jobis.common.utils.TokenProvider;
 import com.jobis.config.exception.UserNotFoundException;
 import com.jobis.domain.dto.*;
 import com.jobis.domain.entity.IncomeDeduction;
@@ -18,9 +20,11 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -30,28 +34,30 @@ public class ScrapService {
     private final MemberRepository memberRepository;
     private final SalaryRepository salaryRepository;
     private final IncomeDeductionRepository incomeDeductionRepository;
+    private final TokenProvider tokenProvider;
 
-    public void scrap()  {
-        ScrapResponseDto scrapResponseDto = callScrapApi();
-        log.info("scrapResponseDto = {}",scrapResponseDto.toString());
+    public ReslutMessage scrap(HttpServletRequest request)  {
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION).substring(7);
+        String userId = tokenProvider.validateTokenAndGetUsername(token);
 
-        Member member = getMemberEntity();
-        saveSalaryEntityFromScrapApi(scrapResponseDto, member);
-        saveIncomeDeductionEntityFromScrapApi(scrapResponseDto, member);
+        Optional<Member> member = memberRepository.findByUserId(userId);
+        Member loginMember = member.orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        ScrapResponseDto scrapResponseDto = callScrapApi(loginMember);
+        saveSalaryEntityFromScrapApi(scrapResponseDto, loginMember);
+        saveIncomeDeductionEntityFromScrapApi(scrapResponseDto, loginMember);
+
+        return new ReslutMessage("success", "성공적으로 저장하였습니다.");
     }
 
-    public ScrapResponseDto callScrapApi() {
+    public ScrapResponseDto callScrapApi(Member loginMember) {
         WebClient webClient = WebClient.builder()
                 .baseUrl("https://codetest.3o3.co.kr/v2/scrap")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer JwtToken")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = (User) principal;
-        Member member = getMemberEntity();
-
-        ScrapRequestDto scrapRequestDto = new ScrapRequestDto(member.getName(), getDecryptedString(member.getRegNo()));
+        ScrapRequestDto scrapRequestDto = new ScrapRequestDto(loginMember.getName(), getDecryptedString(loginMember.getRegNo()));
 
         return  webClient
                 .post()
@@ -95,6 +101,7 @@ public class ScrapService {
 
     private Long commaSeparatedStringToLong(String str){
         str = str.replaceAll(",","");
+        str = str.replaceAll("\\.","");
         return Long.parseLong(str);
     }
 
@@ -119,12 +126,5 @@ public class ScrapService {
     private LocalDate convertToLocalDate (String dateStr){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         return LocalDate.parse(dateStr, formatter);
-    }
-
-    private Member getMemberEntity(){
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = (User) principal;
-        return memberRepository.findByUserId(user.getUsername())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 }

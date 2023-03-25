@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -31,18 +32,18 @@ public class SzsController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> myInfo()  {
-        return ResponseEntity.ok().body(memberService.getMemberInfo());
+    public ResponseEntity<?> myInfo(HttpServletRequest request)  {
+        return ResponseEntity.ok().body(memberService.getMemberInfo(request));
     }
 
     @PostMapping("/scrap")
-    public ResponseEntity<?> scrap()  {
-        return ResponseEntity.ok().body(scrapService.scrap());
+    public ResponseEntity<?> scrap(HttpServletRequest request)  {
+        return ResponseEntity.ok().body(scrapService.scrap(request));
     }
 
-    @GetMapping("/szs/refund")
-    public ResponseEntity<?> refund(){
-        return ResponseEntity.ok().body()
-    }
+//    @GetMapping("/szs/refund")
+//    public ResponseEntity<?> refund(){
+//        return ResponseEntity.ok().body();
+//    }
 
 }
