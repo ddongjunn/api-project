@@ -4,9 +4,12 @@ import com.jobis.config.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.NoSuchElementException;
 
 @Slf4j
 @RestControllerAdvice(basePackages = "com.jobis.controller")
@@ -16,7 +19,7 @@ public class ExceptionControllerAdvice {
     public ResponseEntity<ErrorResult> RegistrationNotAllowedExHandler(RegistrationNotAllowedException e){
         log.error("ExceptionController: "+e.getMessage());
         ErrorResult errorResult = new ErrorResult("RegistrationNotAllowed", e.getMessage());
-        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResult, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
@@ -37,6 +40,20 @@ public class ExceptionControllerAdvice {
     public ResponseEntity<ErrorResult> UserNotFoundExHandler(UserNotFoundException e) {
         log.error("ExceptionController: " + e.getMessage());
         ErrorResult errorResult = new ErrorResult("UsernameNotFound", e.getMessage());
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResult> BadCredentialsExHandler(BadCredentialsException e) {
+        log.error("ExceptionController: " + e.getMessage());
+        ErrorResult errorResult = new ErrorResult("BadCredentials", e.getMessage());
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NoSuchSalaryDataException.class)
+    public ResponseEntity<ErrorResult> NoSuchSalaryDataExHandler(NoSuchSalaryDataException e) {
+        log.error("ExceptionController: " + e.getMessage());
+        ErrorResult errorResult = new ErrorResult("NoSuchSalaryData", e.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 

@@ -1,6 +1,7 @@
 package com.jobis.service;
 
 import com.jobis.common.utils.TokenProvider;
+import com.jobis.config.exception.NoSuchSalaryDataException;
 import com.jobis.domain.SalaryMapping;
 import com.jobis.domain.dto.RefundResponseDto;
 import com.jobis.repository.IncomeDeductionRepository;
@@ -35,7 +36,7 @@ public class RefundService {
             calculatedTaxAmount = salaryData.get(0).getCalculatedTaxAmount();
             totalPayment = salaryData.get(0).getTotalPayment();
         } catch (IndexOutOfBoundsException e) {
-            throw new NoSuchElementException("Salary data not found");
+            throw new NoSuchSalaryDataException("스크랩 데이터를 찾을 수 없습니다.");
         }
 
         Long employmentIncomeTaxAmount = calculateEmploymentIncomeTaxAmount(calculatedTaxAmount);

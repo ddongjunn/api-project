@@ -1,6 +1,5 @@
 package com.jobis.service;
 
-import com.jobis.common.ReslutMessage;
 import com.jobis.common.utils.AES256;
 import com.jobis.common.utils.TokenProvider;
 import com.jobis.config.exception.UserNotFoundException;
@@ -34,7 +33,7 @@ public class ScrapService {
     private final IncomeDeductionRepository incomeDeductionRepository;
     private final TokenProvider tokenProvider;
 
-    public ReslutMessage scrap(HttpServletRequest request)  {
+    public ScrapResponse scrap(HttpServletRequest request)  {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION).substring(7);
         String userId = tokenProvider.validateTokenAndGetUsername(token);
         log.info("token {} ",token);
@@ -46,7 +45,7 @@ public class ScrapService {
         saveSalaryEntityFromScrapApi(scrapResponseDto, loginMember);
         saveIncomeDeductionEntityFromScrapApi(scrapResponseDto, loginMember);
 
-        return new ReslutMessage("success", "성공적으로 저장하였습니다.");
+        return new ScrapResponse("success", "성공적으로 저장하였습니다.");
     }
 
     public ScrapResponseDto callScrapApi(Member loginMember) {

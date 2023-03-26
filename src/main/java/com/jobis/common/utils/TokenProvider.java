@@ -35,7 +35,7 @@ public class TokenProvider {
                 .sign(this.hmac512);
     }
 
-    public String validateTokenAndGetUsername(String token) {
+    public String validateTokenAndGetUsername(String token){
         try {
             return verifier.verify(token).getSubject();
         } catch (final JWTVerificationException verificationEx) {
