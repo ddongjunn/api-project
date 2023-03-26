@@ -12,6 +12,7 @@ import java.util.Collection;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Member implements UserDetails {
 
     @Id
