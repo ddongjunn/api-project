@@ -9,49 +9,47 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.NoSuchElementException;
-
 @Slf4j
 @RestControllerAdvice(basePackages = "com.jobis.controller")
 public class ExceptionControllerAdvice {
 
     @ExceptionHandler(RegistrationNotAllowedException.class)
-    public ResponseEntity<ErrorResult> RegistrationNotAllowedExHandler(RegistrationNotAllowedException e){
+    public ResponseEntity<ErrorResult> registrationNotAllowedExHandler(RegistrationNotAllowedException e){
         log.error("ExceptionController: "+e.getMessage());
         ErrorResult errorResult = new ErrorResult("RegistrationNotAllowed", e.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ErrorResult> UserAlreadyExistsExHandler(UserAlreadyExistsException e){
+    public ResponseEntity<ErrorResult> userAlreadyExistsExHandler(UserAlreadyExistsException e){
         log.error("ExceptionController: "+e.getMessage());
         ErrorResult errorResult = new ErrorResult("UserAlreadyExists", e.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ErrorResult> UsernameNotFoundExHandler(UsernameNotFoundException e){
+    public ResponseEntity<ErrorResult> usernameNotFoundExHandler(UsernameNotFoundException e){
         log.error("ExceptionController: "+e.getMessage());
         ErrorResult errorResult = new ErrorResult("UsernameNotFound", e.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResult> UserNotFoundExHandler(UserNotFoundException e) {
+    public ResponseEntity<ErrorResult> userNotFoundExHandler(UserNotFoundException e) {
         log.error("ExceptionController: " + e.getMessage());
         ErrorResult errorResult = new ErrorResult("UsernameNotFound", e.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResult> BadCredentialsExHandler(BadCredentialsException e) {
+    public ResponseEntity<ErrorResult> badCredentialsExHandler(BadCredentialsException e) {
         log.error("ExceptionController: " + e.getMessage());
         ErrorResult errorResult = new ErrorResult("BadCredentials", e.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NoSuchSalaryDataException.class)
-    public ResponseEntity<ErrorResult> NoSuchSalaryDataExHandler(NoSuchSalaryDataException e) {
+    public ResponseEntity<ErrorResult> noSuchSalaryDataExHandler(NoSuchSalaryDataException e) {
         log.error("ExceptionController: " + e.getMessage());
         ErrorResult errorResult = new ErrorResult("NoSuchSalaryData", e.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);

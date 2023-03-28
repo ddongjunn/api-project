@@ -6,7 +6,7 @@ import com.jobis.common.utils.TokenProvider;
 import com.jobis.domain.dto.LoginResponseDto;
 import com.jobis.domain.dto.SignUpRequestDto;
 import com.jobis.domain.dto.SignUpResponseDto;
-import com.jobis.repository.MemberRepository;
+
 import com.jobis.service.MemberService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,9 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

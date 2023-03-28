@@ -80,7 +80,7 @@ public class MemberService {
     /**
      * 회원정보 조회
      */
-    public MemberInfoResponseDto getMemberInfo(HttpServletRequest request)  {
+    public MemberInfoResponseDto getMemberInfo(HttpServletRequest request) {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION).substring(7);
         String userId = tokenProvider.validateTokenAndGetUsername(token);
 
@@ -110,22 +110,14 @@ public class MemberService {
         joinMember.orElseThrow(() -> new RegistrationNotAllowedException("등록된 사용자가 아닙니다."));
     }
 
-    public String getDecryptedRegNoPrefix(Member member) {
+    public String getDecryptedRegNoPrefix(Member member){
         AES256 aes256 = new AES256();
-        try {
-            return aes256.decryptAES256RegNo(member.getRegNo());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return aes256.decryptAES256RegNo(member.getRegNo());
     }
 
-    public String encryptAES256String(String text) {
+    public String encryptAES256String(String text){
         AES256 aes256 = new AES256();
-        try {
-            return aes256.encryptAES256(text);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return aes256.encryptAES256(text);
     }
 }
 
