@@ -3,6 +3,8 @@ package com.jobis.controller;
 import com.jobis.domain.dto.LoginRequestDto;
 import com.jobis.domain.dto.SignUpRequestDto;
 import com.jobis.service.MemberService;
+import com.jobis.service.ScrapService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +22,12 @@ public class SzsController {
     private final ScrapService scrapService;
 
     @GetMapping("/hello")
-    public String hello(){
+    public String hello() {
         return "hello";
     }
 
     @GetMapping("/hello2")
-    public String hello2(){
+    public String hello2() {
         return "hello";
     }
 
@@ -35,7 +37,7 @@ public class SzsController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDto memberLoginDto){
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto memberLoginDto) {
         return ResponseEntity.ok().body(memberService.login(memberLoginDto));
     }
 
