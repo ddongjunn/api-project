@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
+import java.util.Date;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -35,7 +35,7 @@ public class TokenProvider {
                 .sign(this.hmac512);
     }
 
-    public String validateTokenAndGetUsername(String token) {
+    public String validateTokenAndGetUsername(String token){
         try {
             return verifier.verify(token).getSubject();
         } catch (final JWTVerificationException verificationEx) {

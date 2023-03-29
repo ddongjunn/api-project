@@ -9,9 +9,10 @@ import javax.persistence.*;
 import java.util.Collection;
 
 @Entity
-@Data
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Member implements UserDetails {
 
     @Id

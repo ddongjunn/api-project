@@ -2,6 +2,7 @@ package com.jobis.service;
 
 import com.jobis.common.utils.AES256;
 import com.jobis.common.utils.TokenProvider;
+import com.jobis.config.exception.UserNotFoundException;
 import com.jobis.config.security.CustomUserDetailsService;
 import com.jobis.domain.dto.*;
 import com.jobis.domain.entity.Member;
@@ -13,6 +14,7 @@ import com.jobis.repository.WhitelistRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +24,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -44,7 +48,7 @@ public class MemberService {
     /**
      * 회원가입
      */
-    public SignUpResponseDto join(SignUpRequestDto memberRegistrationDTO) throws Exception {
+    public SignUpResponseDto join(SignUpRequestDto memberRegistrationDTO){
         checkDuplicateUserId(memberRegistrationDTO.getUserId());
         isAvailableUser(memberRegistrationDTO);
 
@@ -76,11 +80,15 @@ public class MemberService {
     /**
      * 회원정보 조회
      */
-    public MemberInfoResponseDto getMemberInfo() throws Exception {
-        User user = getCurrentUser();
-        String birthdate = getDecryptedRegNoPrefix(user);
-        Optional<Member> member = memberRepository.findByUserId(user.getUsername());
-        return new MemberInfoResponseDto(member.get().getUserId(), member.get().getName(), birthdate);
+    public MemberInfoResponseDto getMemberInfo(HttpServletRequest request) {
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION).substring(7);
+        String userId = tokenProvider.validateTokenAndGetUsername(token);
+
+        Optional<Member> member = memberRepository.findByUserId(userId);
+        Member loginMember = member.orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+        String birthdate = getDecryptedRegNoPrefix(loginMember);
+
+        return new MemberInfoResponseDto(loginMember.getUserId(), loginMember.getName(), birthdate);
     }
 
 
@@ -97,27 +105,19 @@ public class MemberService {
     /**
      * 회원 가입 가능 유저 확인
      */
-    private void isAvailableUser(SignUpRequestDto memberRegistrationDTO) {
+    public void isAvailableUser(SignUpRequestDto memberRegistrationDTO) {
         Optional<Whitelist> joinMember = whitelistRepository.findByUserIdAndRegNo(memberRegistrationDTO.getName(), memberRegistrationDTO.getRegNo());
         joinMember.orElseThrow(() -> new RegistrationNotAllowedException("등록된 사용자가 아닙니다."));
     }
 
-    User getCurrentUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return (User) principal;
-    }
-
-    private String getDecryptedRegNoPrefix(User user) throws Exception {
+    public String getDecryptedRegNoPrefix(Member member){
         AES256 aes256 = new AES256();
-        Optional<Member> member = memberRepository.findByUserId(user.getUsername());
-        return aes256.decryptAES256RegNo(member.get().getRegNo());
+        return aes256.decryptAES256RegNo(member.getRegNo());
     }
 
-    private String encryptAES256String(String text) throws Exception {
+    public String encryptAES256String(String text){
         AES256 aes256 = new AES256();
         return aes256.encryptAES256(text);
     }
-
-
 }
 

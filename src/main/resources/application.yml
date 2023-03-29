@@ -5,7 +5,7 @@ spring:
       enabled: true
 
   datasource:
-    url: jdbc:h2:~/jobis
+    url: jdbc:h2:~/test
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -35,5 +35,10 @@ aes256:
   alg: AES/CBC/PKCS5Padding
   key: abcdefghabcdefghabcdefghabcdefgh
   iv: 0123456789abcdef
+
+server:
+  error:
+    whitelabel:
+      enabled: false
 
 
