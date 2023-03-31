@@ -24,8 +24,7 @@ public class RefundService {
     private final IncomeDeductionRepository incomeDeductionRepository;
     private final SalaryRepository salaryRepository;
     private final TokenProvider tokenProvider;
-    public RefundResponseDto refund(HttpServletRequest request){
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION).substring(7);
+    public RefundResponseDto refund(String token){
         String userId = tokenProvider.validateTokenAndGetUsername(token);
 
         //산출세액, 총급여
@@ -44,10 +43,16 @@ public class RefundService {
         List<Map<String, Object>> incomeDeductionData = incomeDeductionRepository.findByUserId(userId);
         Long retirementPensionTaxAmount = calculateRetirementPensionTaxAmount(incomeDeductionData);
         Long specialDeductionTaxAmount = getSpecialDeductionTaxAmount(incomeDeductionData, totalPayment);
+
         Long standardTaxAmount = calculateStandardTaxAmount(specialDeductionTaxAmount);
+        if(standardTaxAmount == 130000){
+            specialDeductionTaxAmount = 0L;
+        }
 
         Long determinedTaxAmount = calculateDeterminedTaxAmount(calculatedTaxAmount, employmentIncomeTaxAmount, specialDeductionTaxAmount, standardTaxAmount, retirementPensionTaxAmount);
-
+        if(determinedTaxAmount < 0){
+            determinedTaxAmount = 0L;
+        }
         return new RefundResponseDto(userId, determinedTaxAmount, retirementPensionTaxAmount);
     }
 
@@ -156,7 +161,7 @@ public class RefundService {
      */
     public Long calculateStandardTaxAmount(Long specialDeductionTaxAmount){
         long standardTaxAmount = 0L;
-        if(specialDeductionTaxAmount > 130001){
+        if(specialDeductionTaxAmount > 130000){
             standardTaxAmount = 130000;
         }
         return standardTaxAmount;
