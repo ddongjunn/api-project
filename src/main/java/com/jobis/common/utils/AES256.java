@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -36,36 +37,46 @@ public class AES256 {
     private String IV; // 16byte
 
     // 암호화
+    // 암호화
     public String encryptAES256(String text){
-        Cipher cipher = initCipher();
-        byte[] encrypted = new byte[0];
-
         try {
-            encrypted = cipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
-        } catch (IllegalBlockSizeException | BadPaddingException e) {
-            throw new RuntimeException(e);
+            Cipher cipher = Cipher.getInstance(ALG);
+            SecretKeySpec keySpec = new SecretKeySpec(KEY.getBytes(), "AES");
+            IvParameterSpec ivParamSpec = new IvParameterSpec(IV.getBytes());
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivParamSpec);
+
+            byte[] encrypted = cipher.doFinal(text.getBytes("UTF-8"));
+            return Base64.getEncoder().encodeToString(encrypted);
+        }catch (Exception e){
+            e.getMessage();
         }
-        return Base64.getEncoder().encodeToString(encrypted);
+        return null;
     }
 
     // 복호화
-    public String decryptAES256(String cipherText){
-        Cipher cipher = initCipher();
-        byte[] decodedBytes = Base64.getDecoder().decode(cipherText);
-        byte[] decrypted = new byte[0];
-
+    // 복호화
+    public String decryptAES256(String cipherText) {
+        byte[] decrypted = null;
         try {
+            Cipher cipher = Cipher.getInstance(ALG);
+            SecretKeySpec keySpec = new SecretKeySpec(KEY.getBytes(), "AES");
+            IvParameterSpec ivParamSpec = new IvParameterSpec(IV.getBytes());
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivParamSpec);
+
+            byte[] decodedBytes = Base64.getDecoder().decode(cipherText);
             decrypted = cipher.doFinal(decodedBytes);
-        } catch (IllegalBlockSizeException | BadPaddingException e) {
-            throw new RuntimeException(e);
+
+            return new String(decrypted, "UTF-8");
+        }catch (Exception e){
+            e.getMessage();
         }
-        return new String(decrypted, StandardCharsets.UTF_8);
+        return null;
     }
 
     public String decryptAES256RegNo(String cipherText){
         Cipher cipher = initCipher();
         byte[] decodedBytes = Base64.getDecoder().decode(cipherText);
-        byte[] decrypted = new byte[0];
+        byte[] decrypted;
 
         try {
             decrypted = cipher.doFinal(decodedBytes);
