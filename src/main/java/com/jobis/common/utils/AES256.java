@@ -1,7 +1,10 @@
 package com.jobis.common.utils;
 
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
@@ -15,16 +18,22 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+@Slf4j
 @NoArgsConstructor
+@Component
 public class AES256 {
+
+
+    //TODO 암호화 에러 (IllegalBlockSizeException)
 
     @Value("${aes256.alg}")
     public String ALG;
+
     @Value("${aes256.key}")
     private String KEY; // 32byte
+
     @Value("${aes256.iv}")
     private String IV; // 16byte
-
 
     // 암호화
     public String encryptAES256(String text){
