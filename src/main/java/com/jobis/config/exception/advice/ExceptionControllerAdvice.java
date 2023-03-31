@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -55,12 +56,19 @@ public class ExceptionControllerAdvice {
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResult> methodArgumentNotValidExHandler(MethodArgumentNotValidException e){
+        ErrorResult errorResult = new ErrorResult("MethodArgumentNotValid", e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler({Exception.class})
     public ResponseEntity<ErrorResult> exceptionAll(Exception e) {
+        ErrorResult errorResult = new ErrorResult("ServerError", e.getMessage());
         log.error("ExceptionController: "+e.getMessage());
         e.printStackTrace();
-        ErrorResult errorResult = new ErrorResult("ServerError", e.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.INTERNAL_SERVER_ERROR);
+
     }
 
 }
