@@ -47,8 +47,8 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("삼쩜삼 백엔드엔지니어 채용 과제")
-                .description("백엔드 API")
+                .title("API 개발")
+                .description("API")
                 .version("1.0")
                 .build();
     }
